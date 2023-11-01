@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { DefineComponent, Ref } from 'vue';
+import NotFound from "./routes/_NotFound.vue";
+// MAIN PAGES
 import Home from "./routes/Home.vue";
 import About from "./routes/About.vue";
-import NotFound from "./routes/_NotFound.vue";
 
 const routes: { [key: string]: DefineComponent<{}, {}, any> } = {
   "/": Home,
