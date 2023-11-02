@@ -1,6 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref, computed } from "vue";
-import type { DefineComponent, Ref } from 'vue';
+import type { DefineComponent, Ref } from "vue";
+import Navbar from "./components/Navbar.vue";
 import NotFound from "./routes/_NotFound.vue";
 // MAIN PAGES
 import Home from "./routes/Home.vue";
@@ -11,7 +12,7 @@ const routes: { [key: string]: DefineComponent<{}, {}, any> } = {
   "/about": About,
 };
 
-const currentPath : Ref<string> = ref(window.location.hash);
+const currentPath: Ref<string> = ref(window.location.hash);
 
 window.addEventListener("hashchange", () => {
   currentPath.value = window.location.hash;
@@ -23,8 +24,11 @@ const currentView = computed(() => {
 </script>
 
 <template>
-  <a href="#/">Home</a> |
-  <a href="#/about">About</a> |
-  <a href="#/non-existent-path">Broken Link</a>
-  <component :is="currentView" />
+  <Navbar />
+  <div id="content-area">
+    <a href="#/">Home</a> |
+    <a href="#/about">About</a> |
+    <a href="#/non-existent-path">Broken Link</a>
+    <component :is="currentView" />
+  </div>
 </template>

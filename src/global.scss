@@ -4,19 +4,34 @@
 @import "node_modules/nord/src/sass/nord.scss";
 
 :root {
+  --border-width: 0.5rem;
+  --border-radius: 3rem;
+
   font-family: "Comfortaa", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  background-color: $nord0;
   color: $nord6;
-  border-style: none;
-  border-width: 2rem;
-  border-color: $nord3;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --inner-radius: calc(var(--border-radius) - var(--border-width));
+}
+
+#app {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+
+  background-color: $nord0;
+
+  #content-area {
+    padding: calc(2 * var(--border-width));
+  }
 }
