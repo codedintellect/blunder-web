@@ -31,7 +31,7 @@
     border-style: none;
     border-right-style: solid;
     border-width: var(--border-width);
-    border-color: $nord2;
+    border-color: var(--border-color);
 
     box-sizing: content-box;
   }
@@ -96,7 +96,7 @@
       width: 100%;
 
       border-radius: inherit;
-      outline: solid var(--border-width) $nord2;
+      outline: solid var(--border-width) var(--border-color);
       box-shadow: 0px 0px 0px 100px $nord1;
 
       clip-path: inset(
