@@ -77,10 +77,12 @@
     }
   }
   #nav-center {
+    $gap: "(var(--inner-radius) + var(--border-radius)) * (1 / cos(var(--angle)) - 1)";
+
     position: relative;
     width: calc(2 * var(--inner-radius));
     min-height: calc(2 * var(--inner-radius));
-    margin-block: calc(2 * var(--border-radius) * (1 / cos(var(--angle)) - 1) - 1px);
+    margin-block: calc(#{$gap});
 
     align-self: flex-end;
 
@@ -100,9 +102,9 @@
       box-shadow: 0px 0px 0px 100px $nord1;
 
       clip-path: inset(
-        calc(-2 * var(--border-radius) * (1 / cos(var(--angle)) - 1) - var(--border-width))
+        calc(-1 * #{$gap} - var(--border-width))
         calc(50% + var(--inner-radius) * sin(var(--angle)))
-        calc(-2 * var(--border-radius) * (1 / cos(var(--angle)) - 1) - var(--border-width))
+        calc(-1 * #{$gap} - var(--border-width))
         -100px
       );
     }
