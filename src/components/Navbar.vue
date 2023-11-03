@@ -41,7 +41,7 @@
 
     position: absolute;
     height: calc(2 * var(--border-radius));
-    width: calc((100% - 2.5rem) / cos(var(--angle)));
+    width: calc((var(--inner-radius) + var(--border-radius)) * tan(var(--angle)));
 
     #{$pos-offset}: calc(-1 * var(--border-width));
     right: var(--inner-radius);
