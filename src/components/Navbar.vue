@@ -1,9 +1,19 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const props = defineProps(["routes"]);
+</script>
 
 <template>
   <div id="navbar">
     <div id="nav-upper"></div>
-    <div id="nav-center"></div>
+    <div id="nav-center">
+      <a
+        v-for="(value, route) in props['routes']"
+        :key="route"
+        :href="'#' + route"
+      >
+        {{ value.iconAlt }}
+      </a>
+    </div>
     <div id="nav-lower"></div>
   </div>
 </template>
@@ -41,7 +51,9 @@
 
     position: absolute;
     height: calc(2 * var(--border-radius));
-    width: calc((var(--inner-radius) + var(--border-radius)) * tan(var(--angle)));
+    width: calc(
+      (var(--inner-radius) + var(--border-radius)) * tan(var(--angle))
+    );
 
     #{$pos-offset}: calc(-1 * var(--border-width));
     right: var(--inner-radius);
@@ -85,6 +97,9 @@
     margin-block: calc(#{$gap});
 
     align-self: flex-end;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 
     border-radius: var(--inner-radius);
 
@@ -103,10 +118,17 @@
 
       clip-path: inset(
         calc(-1 * #{$gap} - var(--border-width))
-        calc(50% + var(--inner-radius) * sin(var(--angle)))
-        calc(-1 * #{$gap} - var(--border-width))
-        -100px
+          calc(50% + var(--inner-radius) * sin(var(--angle)))
+          calc(-1 * #{$gap} - var(--border-width)) -100px
       );
+    }
+
+    & > * {
+      aspect-ratio: 1;
+
+      margin: 10%;
+
+      text-align: center;
     }
   }
 }
