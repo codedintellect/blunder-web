@@ -33,6 +33,17 @@
   background-color: $nord0;
 
   #content-area {
-    padding: calc(2 * var(--border-width));
+    position: relative;
+
+    margin: calc(2 * var(--border-width));
+
+    flex: 1;
   }
+}
+
+.container {
+  background-color: $nord1;
+  border-style: solid;
+  border-width: var(--border-width);
+  border-color: var(--border-color);
 }
