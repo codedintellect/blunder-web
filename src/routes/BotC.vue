@@ -4,6 +4,13 @@
 const total = 10;
 
 function circularPosition(id, total) {
+  if (total % 2 == 1) {
+    total++;
+    if (id >= total / 2) {
+      id++;
+    }
+  }
+
   let Y = 10;
   let X = Y * 16 / 9;
   let radius = 50 - 2 * Y;
@@ -27,30 +34,24 @@ function circularPosition(id, total) {
     return style;
   }
 
-  if (total % 2 == 0) {
-    let k = total / 4 - 1;
-    let b = k * (X - 2 * Y) + Y;
-    console.log(k, b);
+  let k = total / 4 - 1;
+  let b = k * (X - 2 * Y) + Y;
+  console.log(k, b);
 
-    let qa = k**2 + 1;
-    let qb = -1 * 2 * k * b;
-    let qc = b**2 - radius**2;
-    let qD = qb**2 - 4 * qa * qc;
+  let qa = k**2 + 1;
+  let qb = -1 * 2 * k * b;
+  let qc = b**2 - radius**2;
+  let qD = qb**2 - 4 * qa * qc;
 
-    let x = (-qb + Math.sqrt(qD)) / (2 * qa);
-    let dist = x - X;
-    let y = Math.sqrt(radius**2 - x**2);
-    y -=
-      (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
-      * (2 * Y + dist);
-    x = Math.sqrt(radius**2 - y**2);
-    style[vert] = `${radius - y}%`;
-    style[side] = `calc(${x}% + 50%)`;
-    console.log(style);
-  }
-  else {
-
-  }
+  let x = (-qb + Math.sqrt(qD)) / (2 * qa);
+  let dist = x - X;
+  let y = Math.sqrt(radius**2 - x**2);
+  y -=
+    (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
+    * (2 * Y + dist);
+  x = Math.sqrt(radius**2 - y**2);
+  style[vert] = `${radius - y}%`;
+  style[side] = `calc(${x}% + 50%)`;
 
   return style;
 }
