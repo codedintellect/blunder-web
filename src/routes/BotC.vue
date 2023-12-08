@@ -1,10 +1,72 @@
 <!--  Blood on the Clocktower  -->
 
 <script setup>
+const total = 10;
 
+function circularPosition(id, total) {
+  let Y = 10;
+  let X = Y * 16 / 9;
+  let radius = 50 - 2 * Y;
+  let style = {
+    'height': `${2*Y}%`,
+    'width': `${2*X}%`,
+  };
+  let side = id < total / 2 ? 'right' : 'left';
+  let vert = Math.abs(id - total / 2) < total / 4 ? 'top' : 'bottom';
+
+  if (id == 0 || id == total / 2) {
+    style['left'] = '50%';
+    style['transform'] = 'translateX(-50%)';
+    style[vert] = '0';
+    return style;
+  }
+  if (id % (total / 4) == 0) {
+    style['bottom'] = `${radius}%`;
+    style['transform'] = 'translateY(-50%)';
+    style[side] = `${radius + 50}%`;
+    return style;
+  }
+
+  if (total % 2 == 0) {
+    let k = total / 4 - 1;
+    let b = k * (X - 2 * Y) + Y;
+    console.log(k, b);
+
+    let qa = k**2 + 1;
+    let qb = -1 * 2 * k * b;
+    let qc = b**2 - radius**2;
+    let qD = qb**2 - 4 * qa * qc;
+
+    let x = (-qb + Math.sqrt(qD)) / (2 * qa);
+    let dist = x - X;
+    let y = Math.sqrt(radius**2 - x**2);
+    y -=
+      (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
+      * (2 * Y + dist);
+    x = Math.sqrt(radius**2 - y**2);
+    style[vert] = `${radius - y}%`;
+    style[side] = `calc(${x}% + 50%)`;
+    console.log(style);
+  }
+  else {
+
+  }
+
+  return style;
+}
 </script>
 
 <template>
+  <div id="play-circle">
+    <video 
+      v-for="i in total"
+      :key="'player-' + i"
+      class="container"
+      :style="circularPosition(i - 1, total)"
+    ></video>
+    <div id="safe-zone"></div>
+  </div>
+
   <div id="bottom">
     <div id="bluffs" class="container"></div>
     <div id="panel">
@@ -39,6 +101,56 @@
 
 <style lang="scss" scoped>
 @import "node_modules/nord/src/sass/nord.scss";
+
+video {
+  position: relative;
+  height: 10rem;
+  width: auto;
+
+  aspect-ratio: 16 / 9;
+
+  border-radius: 2rem 1rem;
+}
+
+#play-circle {
+  position: absolute;
+  height: 100%;
+  width: auto;
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  aspect-ratio: 1;
+
+  margin-right: var(--border-width);
+
+  background-color: rgba($nord10, 0.7);
+  border-radius: 50%;
+
+  --radius: calc(50% - 20%);
+
+  & > video {
+    position: absolute;
+  }
+
+  #safe-zone {
+    position: absolute;
+    height: calc(2 * var(--radius));
+    width: auto;
+
+    aspect-ratio: 1;
+
+    left: 50%;
+    top: 50%;
+    
+    transform: translate(-50%, -50%);
+
+    border-style: solid;
+    border-color: rgba($nord5, 0.5);
+    border-width: 1px;
+    border-radius: 50%;
+  }
+}
 
 #bottom {
   position: absolute;
@@ -82,16 +194,6 @@
     display: flex;
     flex-direction: row-reverse;
     gap: inherit;
-
-    & > * {
-      position: relative;
-      height: 10rem;
-      width: auto;
-
-      aspect-ratio: 16 / 9;
-
-      border-radius: 2rem 1rem;
-    }
   }
 
   #stage-switcher {
