@@ -1,9 +1,13 @@
 <!--  Blood on the Clocktower  -->
 
-<script setup>
+<script lang="ts" setup>
+import Communication from "../components/jitsi";
+
+Communication.join("test");
+
 const total = 10;
 
-function circularPosition(id, total) {
+function circularPosition(id: number, total: number) {
   if (total % 2 == 1) {
     total++;
     if (id >= total / 2) {
@@ -14,7 +18,7 @@ function circularPosition(id, total) {
   let Y = 10;
   let X = Y * 16 / 9;
   let radius = 50 - 2 * Y;
-  let style = {
+  let style: any = {
     'height': `${2*Y}%`,
     'width': `${2*X}%`,
   };

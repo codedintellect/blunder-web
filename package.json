@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@jitsi/rnnoise-wasm": "^0.1.0",
     "nord": "^0.2.1",
     "vue": "^3.3.4"
   },
   "devDependencies": {
+    "@types/audioworklet": "^0.0.52",
+    "@types/emscripten": "^1.39.10",
     "@vitejs/plugin-vue": "^4.2.3",
     "autoprefixer": "^10.4.16",
     "node-sass": "^9.0.0",
