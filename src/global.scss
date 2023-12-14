@@ -47,3 +47,9 @@
   border-width: var(--border-width);
   border-color: var(--border-color);
 }
+
+.mirrored {
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+  -moz-transform:rotateY(180deg); /* Firefox */
+}

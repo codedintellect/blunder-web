@@ -1,9 +1,21 @@
 <!--  Blood on the Clocktower  -->
 
 <script lang="ts" setup>
+import { Ref, ref } from "vue";
 import Communication from "../components/jitsi";
+import Settings from "/src/components/jitsi/Settings.vue";
+
+// Icons
+import cameraSvg from "/src/assets/icons/camera.vue";
+import microphoneSvg from "/src/assets/icons/microphone.vue";
+import settingsSvg from "/src/assets/icons/settings.vue";
 
 Communication.join("test");
+
+const selfVideo: Ref<boolean> = Communication.selfVideo;
+const selfAudio: Ref<boolean> = Communication.selfAudio;
+
+const mediaSettings: Ref<boolean> = ref(false);
 
 const total = 10;
 
@@ -40,7 +52,6 @@ function circularPosition(id: number, total: number) {
 
   let k = total / 4 - 1;
   let b = k * (X - 2 * Y) + Y;
-  console.log(k, b);
 
   let qa = k**2 + 1;
   let qb = -1 * 2 * k * b;
@@ -80,9 +91,27 @@ function circularPosition(id: number, total: number) {
         <button />
       </div>
       <div id="communication-controls" class="panel-buttons container">
-        <button />
-        <button />
-        <button />
+        <button
+          @click="() => { mediaSettings = true; }"
+        >
+          <settings-svg />
+        </button>
+        <button
+          @click="Communication.toggleVideo"
+          :class="{
+            off: !selfVideo,
+          }"
+        >
+          <camera-svg />
+        </button>
+        <button
+          @click="Communication.toggleAudio"
+          :class="{
+            off: !selfAudio,
+          }"
+        >
+          <microphone-svg />
+        </button>
       </div>
     </div>
     <div id="storytellers">
@@ -102,6 +131,11 @@ function circularPosition(id: number, total: number) {
       <button>Order</button>
     </div>
   </div>
+
+  <Settings
+    v-if="mediaSettings"
+    @close="() => { mediaSettings = false; }"
+  />
 </template>
 
 <style lang="scss" scoped>
@@ -229,6 +263,55 @@ video {
         width: 3.2rem;
 
         background-color: $nord1;
+
+        & > svg {
+          height: 100%;
+          width: 100%;
+
+          padding-block: 16%;
+
+          color: $nord4;
+
+          pointer-events: none;
+
+          transition: color 150ms ease-in;
+        }
+
+        &:after {
+          content: "";
+
+          position: absolute;
+          height: 0.3rem;
+          width: 0rem; /* max: 2.6rem */
+          
+          top: 0.78rem;
+          left: 0.78rem;
+
+          background-color: $nord11;
+          border-radius: 0.15rem;
+          outline-style: solid;
+          outline-color: $nord1;
+          outline-width: 0.2rem;
+
+          transform-origin: 0.15rem 0.15rem;
+          transform: translate(-0.15rem, -0.15rem) rotate(45deg);
+
+          pointer-events: none;
+
+          transition: width 150ms ease-in;
+        }
+
+        &.off {
+          & > svg {
+            color: rgba($nord4, 0.5);
+          }
+
+          &:after {
+            width: 2.6rem;
+
+            opacity: 1;
+          } 
+        }
       }
     }
 }

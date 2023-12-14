@@ -131,5 +131,7 @@ const props = defineProps(["routes"]);
       text-align: center;
     }
   }
+
+  z-index: 999;
 }
 </style>
