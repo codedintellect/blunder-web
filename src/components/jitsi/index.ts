@@ -18,6 +18,9 @@ export default abstract class Communication {
   public static selfMirror: Ref<boolean> = ref(true);
 
   public static mediaDevices: Ref<Object> = ref({});
+  public static defaultVideo: Ref<string> = ref('');
+  public static defaultAudio: Ref<string> = ref('');
+  public static defaultOutput: Ref<string> = ref('');
 
   public static init(): void {
     JitsiMeetJS.init({
@@ -30,7 +33,8 @@ export default abstract class Communication {
       JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
       (devices: Object) => {
         this.mediaDevices.value = devices;
-        console.log(this.mediaDevices.value);
+        this.defaultOutput.value =
+          JitsiMeetJS.mediaDevices.getAudioOutputDevice();
       }
     )
     
@@ -107,6 +111,10 @@ export default abstract class Communication {
       this.selfVideoTrack = JitsiMeetJS.createLocalTracks({
         devices: ["video"],
         facingMode: "user",
+        cameraDeviceId: this.defaultVideo.value,
+      });
+      this.selfVideoTrack.then((track: any) => {
+        this.defaultVideo.value = track[0].deviceId;
       });
     }
     return this.selfVideoTrack;
@@ -116,11 +124,13 @@ export default abstract class Communication {
     if (!this.selfAudioTrack) {
       this.selfAudioTrack = JitsiMeetJS.createLocalTracks({
         devices: ["audio"],
+        micDeviceId: this.defaultAudio.value,
       });
+      this.selfAudioTrack.then((track: any) => {
+        this.defaultAudio.value = track[0].deviceId;
+        track[0].setEffect(new NoiseSuppressionEffect());
+      })
     }
-    this.selfAudioTrack.then((track: any) => {
-      track[0].setEffect(new NoiseSuppressionEffect());
-    })
     return this.selfAudioTrack;
   }
 
@@ -159,18 +169,36 @@ export default abstract class Communication {
   }
 
   public static attachSelf(el: HTMLMediaElement): void {
-    this.getSelfVideoTrack().then((track: any) => {
-      track[0].attach(el);
-    });
+    if (el.tagName === 'VIDEO') {
+      this.getSelfVideoTrack().then((track: any) => {
+        track[0].attach(el);
+      });
+    }
+    else if (el.tagName === 'AUDIO') {
+      this.getSelfAudioTrack().then((track: any) => {
+        track[0].attach(el);
+      });
+    }
   }
 
   public static detachSelf(el: HTMLMediaElement): void {
-    this.getSelfVideoTrack().then((track: any) => {
-      track[0].detach(el);
-      if (!track[0].conference) {
-        track[0].dispose();
-        this.selfVideoTrack = undefined;
-      }
-    });
+    if (el.tagName === 'VIDEO') {
+      this.getSelfVideoTrack().then((track: any) => {
+        track[0].detach(el);
+        if (!track[0].conference) {
+          track[0].dispose();
+          this.selfVideoTrack = undefined;
+        }
+      });
+    }
+    else if (el.tagName === 'AUDIO') {
+      this.getSelfAudioTrack().then((track: any) => {
+        track[0].detach(el);
+        if (!track[0].conference) {
+          track[0].dispose();
+          this.selfAudioTrack = undefined;
+        }
+      });
+    }
   }
 }
