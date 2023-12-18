@@ -186,13 +186,10 @@ function dropdown(event: MouseEvent) {
         @click="dropdown"
       >
         <headphones-svg />
-        <span v-if="defaultOutput === 'default'">
-          Default Device
-        </span>
-        <span v-else-if="defaultOutput">
+        <span v-if="defaultOutput">
           {{ 
             sortedDevices.get('audiooutput')?.filter((x: MediaDeviceInfo) =>
-              x.deviceId === defaultOutput)[0].label
+              x.deviceId === defaultOutput)?.[0]?.label || defaultOutput
           }}
         </span>
         <span v-else>

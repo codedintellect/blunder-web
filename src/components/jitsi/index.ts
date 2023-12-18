@@ -58,7 +58,7 @@ export default abstract class Communication {
 
     this.connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-      () => { },
+      () => {},
     );
     this.connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_FAILED,
@@ -206,7 +206,6 @@ export default abstract class Communication {
 
   public static selfVolumeMonitor(el: any): void {
     this.getSelfAudioTrack().then((track: any) => {
-      console.log(track[0]);
       if (!el.fn) {
         el.fn = (level: Number) => {
           el.style.setProperty('--usage', level);
@@ -227,9 +226,21 @@ export default abstract class Communication {
     console.log(kind, deviceId);
     switch (kind) {
       case "videoinput": {
+        this.getSelfVideoTrack().then((track: any) => {
+          this.defaultVideo.value = deviceId;
+          track[0].dispose();
+          this.selfVideoTrack = undefined;
+          this.getSelfVideoTrack();
+        });
         break;
       }
       case "audioinput": {
+        this.getSelfAudioTrack().then((track: any) => {
+          this.defaultAudio.value = deviceId;
+          track[0].dispose();
+          this.selfAudioTrack = undefined;
+          this.getSelfAudioTrack();
+        });
         break;
       }
       case "audiooutput": {
