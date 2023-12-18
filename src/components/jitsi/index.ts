@@ -17,7 +17,7 @@ export default abstract class Communication {
   public static selfAudio: Ref<boolean> = ref(true);
   public static selfMirror: Ref<boolean> = ref(true);
 
-  public static mediaDevices: Ref<Object> = ref({});
+  public static mediaDevices: Ref<MediaDeviceInfo[]> = ref([]);
   public static defaultVideo: Ref<string> = ref('');
   public static defaultAudio: Ref<string> = ref('');
   public static defaultOutput: Ref<string> = ref('');
@@ -31,12 +31,14 @@ export default abstract class Communication {
 
     JitsiMeetJS.mediaDevices.addEventListener(
       JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
-      (devices: Object) => {
+      (devices: MediaDeviceInfo[]) => {
         this.mediaDevices.value = devices;
         this.defaultOutput.value =
           JitsiMeetJS.mediaDevices.getAudioOutputDevice();
       }
     )
+
+    console.log(JitsiMeetJS.events);
     
     this.connect();
   }
@@ -128,7 +130,7 @@ export default abstract class Communication {
       });
       this.selfAudioTrack.then((track: any) => {
         this.defaultAudio.value = track[0].deviceId;
-        track[0].setEffect(new NoiseSuppressionEffect());
+        //track[0].setEffect(new NoiseSuppressionEffect());
       })
     }
     return this.selfAudioTrack;
@@ -199,6 +201,40 @@ export default abstract class Communication {
           this.selfAudioTrack = undefined;
         }
       });
+    }
+  }
+
+  public static selfVolumeMonitor(el: any): void {
+    this.getSelfAudioTrack().then((track: any) => {
+      console.log(track[0]);
+      if (!el.fn) {
+        el.fn = (level: Number) => {
+          el.style.setProperty('--usage', level);
+        }
+        track[0].on(
+          JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, el.fn
+        );
+      }
+      else {
+        track[0].off(
+          JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, el.fn
+        );
+      }
+    });
+  }
+
+  public static changeDevice(deviceId: string, kind: string) {
+    console.log(kind, deviceId);
+    switch (kind) {
+      case "videoinput": {
+        break;
+      }
+      case "audioinput": {
+        break;
+      }
+      case "audiooutput": {
+        break;
+      }
     }
   }
 }
