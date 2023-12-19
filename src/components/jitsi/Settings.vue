@@ -5,7 +5,6 @@ import Communication from "../jitsi";
 // Icons
 import chevronDownSvg from "/src/assets/icons/chevron-down.vue";
 import closeSvg from "/src/assets/icons/close.vue";
-import headphonesSvg from "/src/assets/icons/headphones.vue";
 import microphoneSvg from "/src/assets/icons/microphone.vue";
 import webcamSvg from "/src/assets/icons/webcam.vue";
 
@@ -16,7 +15,6 @@ const mediaDevices: Ref<MediaDeviceInfo[]> = Communication.mediaDevices;
 
 const defaultVideo: Ref<string> = Communication.defaultVideo;
 const defaultAudio: Ref<string> = Communication.defaultAudio;
-const defaultOutput: Ref<string> = Communication.defaultOutput;
 
 const sortedDevices = computed(function() {
   let result: Map<MediaDeviceKind, MediaDeviceInfo[]> = new Map();
@@ -173,44 +171,6 @@ function dropdown(event: MouseEvent) {
         v-self-volume
         class="slider"
       ></div>
-    </div>
-
-    <div class="separator" />
-
-    <div class="option-row">
-      <div
-        class="dropdown"
-        :class="{
-          empty: (sortedDevices.get('audiooutput')?.length || 0) <= 1,
-        }"
-        @click="dropdown"
-      >
-        <headphones-svg />
-        <span v-if="defaultOutput">
-          {{ 
-            sortedDevices.get('audiooutput')?.filter((x: MediaDeviceInfo) =>
-              x.deviceId === defaultOutput)?.[0]?.label || defaultOutput
-          }}
-        </span>
-        <span v-else>
-          Not Found
-        </span>
-        <chevron-down-svg />
-        <div class="dropdown-options">
-          <span
-            v-for="device in sortedDevices.get('audiooutput')"
-            @click="Communication.changeDevice(device.deviceId, device.kind)"
-            :hidden="device.deviceId === defaultOutput"
-          >
-            {{ device.label }}
-          </span>
-        </div>
-      </div>
-      <div class="slider">
-        <div>
-          <span>VOLUME:</span>
-        </div>
-      </div>
     </div>
 
     <button

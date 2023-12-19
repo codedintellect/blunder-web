@@ -20,7 +20,6 @@ export default abstract class Communication {
   public static mediaDevices: Ref<MediaDeviceInfo[]> = ref([]);
   public static defaultVideo: Ref<string> = ref('');
   public static defaultAudio: Ref<string> = ref('');
-  public static defaultOutput: Ref<string> = ref('');
 
   public static init(): void {
     JitsiMeetJS.init({
@@ -33,8 +32,6 @@ export default abstract class Communication {
       JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
       (devices: MediaDeviceInfo[]) => {
         this.mediaDevices.value = devices;
-        this.defaultOutput.value =
-          JitsiMeetJS.mediaDevices.getAudioOutputDevice();
       }
     )
 
@@ -241,9 +238,6 @@ export default abstract class Communication {
           this.selfAudioTrack = undefined;
           this.getSelfAudioTrack();
         });
-        break;
-      }
-      case "audiooutput": {
         break;
       }
     }
