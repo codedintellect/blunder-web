@@ -11,7 +11,8 @@ import cameraSvg from "/src/assets/icons/camera.vue";
 import microphoneSvg from "/src/assets/icons/microphone.vue";
 import settingsSvg from "/src/assets/icons/settings.vue";
 
-Communication.join("test");
+if (!Communication.room)
+  Communication.join("test");
 
 const broadcastAudio: Ref<boolean> = MediaControl.audio.broadcast;
 const broadcastVideo: Ref<boolean> = MediaControl.video.broadcast;
@@ -19,6 +20,7 @@ const broadcastVideo: Ref<boolean> = MediaControl.video.broadcast;
 const mediaSettings: Ref<boolean> = ref(false);
 
 const total = 10;
+const scale = 20;
 
 function circularPosition(id: number, total: number) {
   if (total % 2 == 1) {
@@ -28,12 +30,12 @@ function circularPosition(id: number, total: number) {
     }
   }
 
-  let Y = 10;
-  let X = Y * 16 / 9;
+  let Y = scale / 2;
+  let X = Y * 16 / 10;
   let radius = 50 - 2 * Y;
   let style: any = {
     'height': `${2*Y}%`,
-    'width': `${2*X}%`,
+    'padding-left': `${2*X}%`,
   };
   let side = id < total / 2 ? 'right' : 'left';
   let vert = Math.abs(id - total / 2) < total / 4 ? 'top' : 'bottom';
@@ -74,7 +76,11 @@ function circularPosition(id: number, total: number) {
 </script>
 
 <template>
-  <div id="play-circle">
+  <div id="play-circle"
+    :style="{
+      '--radius': `${50 - scale}%`,
+    }"
+  >
     <video 
       v-for="i in total"
       :key="'player-' + i"
@@ -147,7 +153,7 @@ video {
   height: 10rem;
   width: auto;
 
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
 
   border-radius: 2rem 1rem;
 }
@@ -166,8 +172,6 @@ video {
 
   background-color: rgba($nord10, 0.7);
   border-radius: 50%;
-
-  --radius: calc(50% - 20%);
 
   & > video {
     position: absolute;
