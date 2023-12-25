@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Ref, computed } from "vue";
-import Communication from "../jitsi";
-import MediaControl from "./classes/MediaControl";
-import JitsiUser from "./classes/User";
+import Communication from "../../utils/jitsi";
+import MediaControl from "../../utils/jitsi/classes/MediaControl";
+import JitsiUser from "../../utils/jitsi/classes/User";
 
 // Icons
 import chevronDownSvg from "/src/assets/icons/chevron-down.vue";

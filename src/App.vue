@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import type { DefineComponent, Ref } from "vue";
-import Communication from "./components/jitsi/index"
+import Communication from "./utils/jitsi"
 // import Navbar from "./components/Navbar.vue";
 import NotFound from "./routes/_NotFound.vue";
 // MAIN PAGES

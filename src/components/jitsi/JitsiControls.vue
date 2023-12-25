@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Ref } from "vue";
-import Communication from ".";
-import MediaControl from "./classes/MediaControl";
+import Communication from "../../utils/jitsi";
+import MediaControl from "../../utils/jitsi/classes/MediaControl";
 
 // Icons
 import cameraSvg from "/src/assets/icons/camera.vue";
