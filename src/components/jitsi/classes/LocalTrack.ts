@@ -73,4 +73,11 @@ export default class JitsiLocalTrack extends JitsiTrack {
       this.setTrack(track[0]);
     });
   }
+
+  public refreshTrack(): void {
+    this.track?.dispose().then(() => {
+      this.track = undefined;
+      this.initTrack();
+    })
+  }
 }

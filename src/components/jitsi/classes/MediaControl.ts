@@ -67,5 +67,6 @@ export default abstract class MediaControl {
     let track = this.getTrack(type);
     if (!track) return;
     track.default.value = deviceId;
+    track.refreshTrack();
   }
 }

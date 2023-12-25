@@ -108,7 +108,9 @@ function dropdown(event: MouseEvent) {
         <div class="dropdown-options">
           <span
             v-for="device in sortedDevices.get('videoinput')"
-            @click=""
+            @click="() => {
+              MediaControl.setDefault('video', device.deviceId);
+            }"
             :hidden="device.deviceId === defaultVideo"
           >
             {{ device.label }}
@@ -150,7 +152,9 @@ function dropdown(event: MouseEvent) {
         <div class="dropdown-options">
           <span
             v-for="device in sortedDevices.get('audioinput')"
-            @click=""
+            @click="() => {
+              MediaControl.setDefault('audio', device.deviceId);
+            }"
             :hidden="device.deviceId === defaultAudio"
           >
             {{ device.label }}
