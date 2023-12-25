@@ -228,7 +228,7 @@ function dropdown(event: MouseEvent) {
 
   video {
     max-height: min(30vmin, 20rem);
-    max-width: 80vmin;
+    max-width: 50vmin;
 
     border-radius: 0.4rem;
   }
@@ -279,6 +279,8 @@ function dropdown(event: MouseEvent) {
 
 .dropdown {
   position: relative;
+
+  // max-width: 50%;
   
   padding: 0.5rem;
 
@@ -399,6 +401,10 @@ function dropdown(event: MouseEvent) {
 
       background: linear-gradient(to right, rgba($nord0, 0), $nord0);
     }
+  }
+
+  & > span {
+    width: 0;
   }
 
   svg {

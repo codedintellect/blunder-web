@@ -35,8 +35,7 @@ export default class JitsiLocalTrack extends JitsiTrack {
     this.track.setEffect(this.effect);
 
     if (this.broadcast.value) {
-      Communication.room?.addTrack(this.track).catch((event: any) => {
-        console.log(event);
+      Communication.room?.addTrack(this.track).catch(() => {
         this.broadcast.value = false;
       });
     }

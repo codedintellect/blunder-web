@@ -1,21 +1,9 @@
 <!--  Blood on the Clocktower  -->
 
 <script lang="ts" setup>
-import { Ref, ref } from "vue";
-import Communication from "../components/jitsi";
-import MediaControl from "../components/jitsi/classes/MediaControl";
-import Settings from "/src/components/jitsi/Settings.vue";
-
-// Icons
-import cameraSvg from "/src/assets/icons/camera.vue";
-import microphoneSvg from "/src/assets/icons/microphone.vue";
-import settingsSvg from "/src/assets/icons/settings.vue";
-
-if (!Communication.room)
-  Communication.join("test");
-
-const broadcastAudio: Ref<boolean> = MediaControl.audio.broadcast;
-const broadcastVideo: Ref<boolean> = MediaControl.video.broadcast;
+import { Ref, ref } from 'vue';
+import JitsiControls from '../components/jitsi/JitsiControls.vue';
+import Settings from '../components/jitsi/Settings.vue';
 
 const mediaSettings: Ref<boolean> = ref(false);
 
@@ -93,38 +81,18 @@ function circularPosition(id: number, total: number) {
   <div id="bottom">
     <div id="bluffs" class="container"></div>
     <div id="panel">
-      <div id="view-switcher" class="panel-buttons container">
+      <div id="view-switcher" class="panel-buttons">
         <button />
         <button />
       </div>
-      <div id="communication-controls" class="panel-buttons container">
-        <button
-          @click="() => { mediaSettings = true; }"
-        >
-          <settings-svg />
-        </button>
-        <button
-          @click="() => { MediaControl.video.changeConnectivity(); }"
-          :class="{
-            off: !broadcastVideo,
-          }"
-        >
-          <camera-svg />
-        </button>
-        <button
-          @click="() => { MediaControl.audio.changeConnectivity(); }"
-          :class="{
-            off: !broadcastAudio,
-          }"
-        >
-          <microphone-svg />
-        </button>
-      </div>
+      <JitsiControls
+        @open="() => { mediaSettings = true; }"
+      />
     </div>
     <div id="storytellers">
       <video class="container"></video>
     </div>
-    <div id="stage-switcher" class="panel-buttons container">
+    <div id="stage-switcher" class="panel-buttons">
       <button />
       <button />
       <button />
@@ -250,75 +218,6 @@ video {
       width: calc((10rem - 4 * var(--border-width)) / 3);
     }
   }
-
-  .panel-buttons {
-      position: relative;
-      width: fit-content;
-
-      display: flex;
-      gap: var(--border-width);
-
-      background-color: var(--border-color);
-
-      overflow: hidden;
-
-      & > * {
-        position: relative;
-        height: 3.2rem;
-        width: 3.2rem;
-
-        background-color: $nord1;
-
-        & > svg {
-          height: 100%;
-          width: 100%;
-
-          padding-block: 16%;
-
-          color: $nord4;
-
-          pointer-events: none;
-
-          transition: color 150ms ease-in;
-        }
-
-        &:after {
-          content: "";
-
-          position: absolute;
-          height: 0.3rem;
-          width: 0rem; /* max: 2.6rem */
-          
-          top: 0.78rem;
-          left: 0.78rem;
-
-          background-color: $nord11;
-          border-radius: 0.15rem;
-          outline-style: solid;
-          outline-color: $nord1;
-          outline-width: 0.2rem;
-
-          transform-origin: 0.15rem 0.15rem;
-          transform: translate(-0.15rem, -0.15rem) rotate(45deg);
-
-          pointer-events: none;
-
-          transition: width 150ms ease-in;
-        }
-
-        &.off {
-          & > svg {
-            color: rgba($nord4, 0.5);
-          }
-
-          &:after {
-            width: 2.6rem;
-
-            opacity: 1;
-          } 
-        }
-      }
-    }
 }
 
 #folders {

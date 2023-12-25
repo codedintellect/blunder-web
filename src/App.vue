@@ -53,7 +53,7 @@ const currentView = computed(() => {
 </script>
 
 <template>
-  <Navbar :routes="routes" />
+  <!-- <Navbar :routes="routes" /> -->
   <div id="content-area">
     <component :is="currentView" />
   </div>
