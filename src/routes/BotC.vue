@@ -3,6 +3,7 @@
 <script lang="ts" setup>
 import { Ref, ref } from "vue";
 import Communication from "../components/jitsi";
+import MediaControl from "../components/jitsi/classes/MediaControl";
 import Settings from "/src/components/jitsi/Settings.vue";
 
 // Icons
@@ -12,8 +13,8 @@ import settingsSvg from "/src/assets/icons/settings.vue";
 
 Communication.join("test");
 
-const selfVideo: Ref<boolean> = Communication.selfVideo;
-const selfAudio: Ref<boolean> = Communication.selfAudio;
+const broadcastAudio: Ref<boolean> = MediaControl.audio.broadcast;
+const broadcastVideo: Ref<boolean> = MediaControl.video.broadcast;
 
 const mediaSettings: Ref<boolean> = ref(false);
 
@@ -97,17 +98,17 @@ function circularPosition(id: number, total: number) {
           <settings-svg />
         </button>
         <button
-          @click="Communication.toggleVideo"
+          @click="() => { MediaControl.video.changeConnectivity(); }"
           :class="{
-            off: !selfVideo,
+            off: !broadcastVideo,
           }"
         >
           <camera-svg />
         </button>
         <button
-          @click="Communication.toggleAudio"
+          @click="() => { MediaControl.audio.changeConnectivity(); }"
           :class="{
-            off: !selfAudio,
+            off: !broadcastAudio,
           }"
         >
           <microphone-svg />

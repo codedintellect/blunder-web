@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { Ref, computed } from "vue";
 import Communication from "../jitsi";
+import MediaControl from "./classes/MediaControl";
+import JitsiUser from "./classes/User";
 
 // Icons
 import chevronDownSvg from "/src/assets/icons/chevron-down.vue";
@@ -10,11 +12,14 @@ import webcamSvg from "/src/assets/icons/webcam.vue";
 
 defineEmits(['close']);
 
-const selfMirror: Ref<boolean> = Communication.selfMirror;
-const mediaDevices: Ref<MediaDeviceInfo[]> = Communication.mediaDevices;
+const selfMirror: Ref<boolean> = MediaControl.selfMirror;
+const noiseSuppression: Ref<boolean> = MediaControl.noiseSuppression;
 
-const defaultVideo: Ref<string> = Communication.defaultVideo;
-const defaultAudio: Ref<string> = Communication.defaultAudio;
+const mediaDevices: Ref<MediaDeviceInfo[]> = MediaControl.mediaDevices;
+const defaultAudio: Ref<string> = MediaControl.audio.default;
+const defaultVideo: Ref<string> = MediaControl.video.default;
+
+const self: Ref<JitsiUser | undefined> = Communication.self;
 
 const sortedDevices = computed(function() {
   let result: Map<MediaDeviceKind, MediaDeviceInfo[]> = new Map();
@@ -26,20 +31,22 @@ const sortedDevices = computed(function() {
 
 const vSelfPreview = {
   beforeMount: (el: HTMLMediaElement) => {
-    Communication.attachSelf(el);
+    MediaControl.getTrack(el.tagName)?.toggleState(true);
+    self.value?.attachContainer(el);
   },
   beforeUnmount: (el: HTMLMediaElement) => {
-    Communication.detachSelf(el);
+    MediaControl.getTrack(el.tagName)?.toggleState(false);
+    self.value?.detachContainer(el);
   },
 };
 
 const vSelfVolume = {
-  beforeMount: (el: HTMLMediaElement) => {
-    Communication.selfVolumeMonitor(el);
-  },
-  beforeUnmount: (el: HTMLMediaElement) => {
-    Communication.selfVolumeMonitor(el);
-  },
+  // beforeMount: (el: HTMLMediaElement) => {
+  //   Communication.selfVolumeMonitor(el);
+  // },
+  // beforeUnmount: (el: HTMLMediaElement) => {
+  //   Communication.selfVolumeMonitor(el);
+  // },
 }
 </script>
 
@@ -101,7 +108,7 @@ function dropdown(event: MouseEvent) {
         <div class="dropdown-options">
           <span
             v-for="device in sortedDevices.get('videoinput')"
-            @click="Communication.changeDevice(device.deviceId, device.kind)"
+            @click=""
             :hidden="device.deviceId === defaultVideo"
           >
             {{ device.label }}
@@ -143,14 +150,22 @@ function dropdown(event: MouseEvent) {
         <div class="dropdown-options">
           <span
             v-for="device in sortedDevices.get('audioinput')"
-            @click="Communication.changeDevice(device.deviceId, device.kind)"
+            @click=""
             :hidden="device.deviceId === defaultAudio"
           >
             {{ device.label }}
           </span>
         </div>
       </div>
-      <button class="active">
+      <button
+        @click="() => {
+          noiseSuppression = !noiseSuppression;
+          MediaControl.applyEffects();
+        }"
+        :class="{
+          active: noiseSuppression,
+        }"
+      >
         DENOISE
       </button>
       <!-- <button
