@@ -22,8 +22,6 @@ export default abstract class Communication {
     });
     JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
 
-    console.log(JitsiMeetJS.events);
-
     MediaControl.init();
     
     this.connect();
@@ -44,7 +42,7 @@ export default abstract class Communication {
 
     this.connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-      () => {},
+      () => { console.log(JitsiMeetJS); },
     );
     this.connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_FAILED,
@@ -75,6 +73,7 @@ export default abstract class Communication {
       JitsiMeetJS.events.conference.TRACK_ADDED,
       (track: any) => {
         if (track.isLocal()) return;
+        console.log(track);
         this.users.value.get(track.getParticipantId())?.setTrack(track);
       },
     );

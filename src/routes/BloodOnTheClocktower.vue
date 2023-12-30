@@ -1,11 +1,44 @@
 <!--  Blood on the Clocktower  -->
 
 <script lang="ts" setup>
-import { Ref, ref } from 'vue';
+import { Ref, computed, ref, watch } from 'vue';
+import Communication from '../utils/jitsi';
+import MediaControl from '../utils/jitsi/classes/MediaControl';
 import JitsiControls from '../components/jitsi/JitsiControls.vue';
 import Settings from '../components/jitsi/Settings.vue';
 
+import { Session } from "../utils/games/botc"
+
 const mediaSettings: Ref<boolean> = ref(false);
+
+const self = Communication.self;
+const users = Communication.users;
+const selfMirror: Ref<boolean> = MediaControl.selfMirror;
+
+const session = new Session("test", self.value?.id);
+const sessionState: Ref<any> = session.state;
+watch(self, function () {
+  session.connect("test", self.value?.id);
+});
+
+const attended = computed(function() {
+  console.log(users.value.size, Object.keys(sessionState.value).filter(x => users.value.has(x)));
+  return Object.keys(sessionState.value).filter(x => users.value.has(x));
+})
+
+const vJitsiStream = {
+  beforeMount: (el: HTMLMediaElement) => {
+    let jitsiId = el.getAttribute("jitsi");
+    if (!jitsiId) return;
+    users.value.get(jitsiId)?.attachContainer(el);
+  },
+  beforeUnmount: (el: HTMLMediaElement) => {
+    let jitsiId = el.getAttribute("jitsi");
+    if (!jitsiId) return;
+    console.log("unmount")
+    users.value.get(jitsiId)?.detachContainer(el);
+  },
+};
 
 const total = 10;
 const scale = 20;
@@ -64,6 +97,19 @@ function circularPosition(id: number, total: number) {
 </script>
 
 <template>
+  <div class="absolute pr-2">
+    <video
+      v-for="key of attended"
+      :key="key"
+      :jitsi="key"
+      v-jitsi-stream
+      :class="{
+        mirrored: users.get(key)?.isLocal() && selfMirror,
+      }"
+      autoplay
+      muted
+    >{{  }}</video>
+  </div>
   <div id="play-circle"
     :style="{
       '--radius': `${50 - scale}%`,

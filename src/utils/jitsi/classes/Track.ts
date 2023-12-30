@@ -10,6 +10,7 @@ export default class JitsiTrack {
 
     for (const container of this._containers) {
       this.track.attach(container);
+      container.play();
     }
   }
 
