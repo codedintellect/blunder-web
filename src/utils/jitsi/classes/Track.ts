@@ -1,10 +1,19 @@
+import { Ref } from "vue";
+
 export default class JitsiTrack {
   protected track?: any;
 
   private _containers: HTMLMediaElement[] = [];
 
-  setTrack(track: any) {
+  public muteMonitors: Ref<boolean>[] = [];
+
+  setTrack(track: any): void {
+    console.log("TRACK SET");
     this.track = track;
+
+    for (const monitor of this.muteMonitors) {
+      monitor.value = !!this.track;
+    }
 
     if (!this.track) return;
 

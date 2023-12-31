@@ -73,8 +73,17 @@ export default abstract class Communication {
       JitsiMeetJS.events.conference.TRACK_ADDED,
       (track: any) => {
         if (track.isLocal()) return;
-        console.log(track);
+        console.log("TRACK ADDED");
         this.users.value.get(track.getParticipantId())?.setTrack(track);
+      },
+    );
+
+    this.room.on(
+      JitsiMeetJS.events.conference.TRACK_REMOVED,
+      (track: any) => {
+        let user = this.users.value.get(track.ownerEndpointId);
+        user?.getTrack(track.getType())?.setTrack(undefined);
+        track.dispose();
       },
     );
 

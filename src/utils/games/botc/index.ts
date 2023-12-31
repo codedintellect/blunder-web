@@ -8,8 +8,14 @@ export class Session {
 
   public state: Ref<any> = ref<any>({});
 
-  constructor(sessionId: string, keyOverride?: string) {
-    this.connect(sessionId, keyOverride);
+  constructor(
+    sessionId: string,
+    keyOverride?: string,
+    delayConnection?: boolean
+  ) {
+    if (!delayConnection) {
+      this.connect(sessionId, keyOverride);
+    }
   }
 
   connect(sessionId: string, keyOverride?: string) {

@@ -3,124 +3,110 @@
 <script lang="ts" setup>
 import { Ref, computed, ref, watch } from 'vue';
 import Communication from '../utils/jitsi';
-import MediaControl from '../utils/jitsi/classes/MediaControl';
 import JitsiControls from '../components/jitsi/JitsiControls.vue';
 import Settings from '../components/jitsi/Settings.vue';
+import Player from '../components/botc/Player.vue';
 
-import { Session } from "../utils/games/botc"
+import { Session } from "../utils/games/botc";
 
 const mediaSettings: Ref<boolean> = ref(false);
 
 const self = Communication.self;
 const users = Communication.users;
-const selfMirror: Ref<boolean> = MediaControl.selfMirror;
 
-const session = new Session("test", self.value?.id);
+const session = new Session("test", self.value?.id, true);
 const sessionState: Ref<any> = session.state;
 watch(self, function () {
   session.connect("test", self.value?.id);
 });
 
-const attended = computed(function() {
-  console.log(users.value.size, Object.keys(sessionState.value).filter(x => users.value.has(x)));
-  return Object.keys(sessionState.value).filter(x => users.value.has(x));
+const participants = computed(function() {
+  return new Map([...users.value].filter(
+    x => Object.keys(sessionState.value).indexOf(x[0]) >= 0)
+  );
 })
 
-const vJitsiStream = {
-  beforeMount: (el: HTMLMediaElement) => {
-    let jitsiId = el.getAttribute("jitsi");
-    if (!jitsiId) return;
-    users.value.get(jitsiId)?.attachContainer(el);
-  },
-  beforeUnmount: (el: HTMLMediaElement) => {
-    let jitsiId = el.getAttribute("jitsi");
-    if (!jitsiId) return;
-    console.log("unmount")
-    users.value.get(jitsiId)?.detachContainer(el);
-  },
-};
+// const total = 10;
+const scale = 10;
+const aspect = 16 / 10;
 
-const total = 10;
-const scale = 20;
+// function circularPosition(id: number, total: number) {
+//   if (total % 2 == 1) {
+//     total++;
+//     if (id >= total / 2) {
+//       id++;
+//     }
+//   }
 
-function circularPosition(id: number, total: number) {
-  if (total % 2 == 1) {
-    total++;
-    if (id >= total / 2) {
-      id++;
-    }
-  }
+//   let Y = scale;
+//   let X = Y * aspect;
+//   let radius = 50 - 2 * Y;
+//   let style: any = {
+//     'height': `${2*Y}%`,
+//     'padding-left': `${2*X}%`,
+//   };
+//   let side = id < total / 2 ? 'right' : 'left';
+//   let vert = Math.abs(id - total / 2) < total / 4 ? 'top' : 'bottom';
 
-  let Y = scale / 2;
-  let X = Y * 16 / 10;
-  let radius = 50 - 2 * Y;
-  let style: any = {
-    'height': `${2*Y}%`,
-    'padding-left': `${2*X}%`,
-  };
-  let side = id < total / 2 ? 'right' : 'left';
-  let vert = Math.abs(id - total / 2) < total / 4 ? 'top' : 'bottom';
+//   if (id == 0 || id == total / 2) {
+//     style['left'] = '50%';
+//     style['transform'] = 'translateX(-50%)';
+//     style[vert] = '0';
+//     return style;
+//   }
+//   if (id % (total / 4) == 0) {
+//     style['bottom'] = `${radius}%`;
+//     style['transform'] = 'translateY(-50%)';
+//     style[side] = `${radius + 50}%`;
+//     return style;
+//   }
 
-  if (id == 0 || id == total / 2) {
-    style['left'] = '50%';
-    style['transform'] = 'translateX(-50%)';
-    style[vert] = '0';
-    return style;
-  }
-  if (id % (total / 4) == 0) {
-    style['bottom'] = `${radius}%`;
-    style['transform'] = 'translateY(-50%)';
-    style[side] = `${radius + 50}%`;
-    return style;
-  }
+//   let k = total / 4 - 1;
+//   let b = k * (X - 2 * Y) + Y;
 
-  let k = total / 4 - 1;
-  let b = k * (X - 2 * Y) + Y;
+//   let qa = k**2 + 1;
+//   let qb = -1 * 2 * k * b;
+//   let qc = b**2 - radius**2;
+//   let qD = qb**2 - 4 * qa * qc;
 
-  let qa = k**2 + 1;
-  let qb = -1 * 2 * k * b;
-  let qc = b**2 - radius**2;
-  let qD = qb**2 - 4 * qa * qc;
+//   let x = (-qb + Math.sqrt(qD)) / (2 * qa);
+//   let dist = x - X;
+//   let y = Math.sqrt(radius**2 - x**2);
+//   y -=
+//     (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
+//     * (2 * Y + dist);
+//   x = Math.sqrt(radius**2 - y**2);
+//   style[vert] = `${radius - y}%`;
+//   style[side] = `calc(${x}% + 50%)`;
 
-  let x = (-qb + Math.sqrt(qD)) / (2 * qa);
-  let dist = x - X;
-  let y = Math.sqrt(radius**2 - x**2);
-  y -=
-    (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
-    * (2 * Y + dist);
-  x = Math.sqrt(radius**2 - y**2);
-  style[vert] = `${radius - y}%`;
-  style[side] = `calc(${x}% + 50%)`;
-
-  return style;
-}
+//   return style;
+// }
 </script>
 
 <template>
-  <div class="absolute pr-2">
-    <video
-      v-for="key of attended"
+  <div class="absolute pr-2 flex flex-col gap-4">
+    <Player
+      v-for="[key, value] of participants.entries()"
       :key="key"
-      :jitsi="key"
-      v-jitsi-stream
-      :class="{
-        mirrored: users.get(key)?.isLocal() && selfMirror,
+      :jitsi-id="key"
+      :player-data="value"
+      :style="{
+        height: `${scale}rem`,
+        width: `${scale * aspect}rem`
       }"
-      autoplay
-      muted
-    >{{  }}</video>
+    />
   </div>
   <div id="play-circle"
     :style="{
       '--radius': `${50 - scale}%`,
     }"
   >
-    <video 
+    <!-- <video 
       v-for="i in total"
       :key="'player-' + i"
       class="container"
       :style="circularPosition(i - 1, total)"
-    ></video>
+    ></video> -->
     <div id="safe-zone"></div>
   </div>
 
@@ -136,7 +122,7 @@ function circularPosition(id: number, total: number) {
       />
     </div>
     <div id="storytellers">
-      <video class="container"></video>
+      <!-- <video class="container"></video> -->
     </div>
     <div id="stage-switcher" class="panel-buttons">
       <button />
@@ -162,16 +148,6 @@ function circularPosition(id: number, total: number) {
 <style lang="scss" scoped>
 @import "node_modules/nord/src/sass/nord.scss";
 
-video {
-  position: relative;
-  height: 10rem;
-  width: auto;
-
-  aspect-ratio: 16 / 10;
-
-  border-radius: 2rem 1rem;
-}
-
 #play-circle {
   position: absolute;
   height: 100%;
@@ -186,10 +162,6 @@ video {
 
   background-color: rgba($nord10, 0.7);
   border-radius: 50%;
-
-  & > video {
-    position: absolute;
-  }
 
   #safe-zone {
     position: absolute;
