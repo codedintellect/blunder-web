@@ -21,6 +21,9 @@ if (!user.isLocal()) {
   user.video.muteMonitors.push(hasVideo);
 }
 
+const isSpeaking: Ref<boolean> = ref(false);
+user.audio.speechMonitors.push(isSpeaking);
+
 const vJitsiStream = {
   mounted: (el: HTMLMediaElement) => {
     user.attachContainer(el);
@@ -39,7 +42,12 @@ const vJitsiStream = {
     }"
   >
     <div class="help"></div>
-    <div class="container">
+    <div
+      class="container"
+      :class="{
+        speaking: isSpeaking && hasAudio,
+      }"
+    >
       <video
         :class="{
           mirrored: mirror && user?.isLocal(),
@@ -109,11 +117,14 @@ const vJitsiStream = {
     outline-width: 0;
 
     transition: box-shadow 200ms, outline-width 100ms;
+    transition-delay: 400ms;
 
     overflow: hidden;
 
     &.speaking {
       outline-width: calc(0.6 * var(--border-width));
+
+      transition-delay: 0s;
     }
 
     video {
