@@ -49,6 +49,13 @@ const vSelfVolume = {
 </script>
 
 <script lang="ts">
+window.addEventListener('keyup', event => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    MediaControl.mediaSettings.value = false;
+  }
+});
+
 function dropdown(event: MouseEvent) {
   const target = event.target as HTMLElement;
   if (!target) {
