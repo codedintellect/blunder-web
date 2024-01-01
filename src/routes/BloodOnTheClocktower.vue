@@ -1,15 +1,12 @@
 <!--  Blood on the Clocktower  -->
 
 <script lang="ts" setup>
-import { Ref, computed, ref, watch } from 'vue';
+import { Ref, computed, watch } from 'vue';
 import Communication from '../utils/jitsi';
 import JitsiControls from '../components/jitsi/JitsiControls.vue';
-import Settings from '../components/jitsi/Settings.vue';
 import Player from '../components/botc/Player.vue';
 
 import { Session } from "../utils/games/botc";
-
-const mediaSettings: Ref<boolean> = ref(false);
 
 const self = Communication.self;
 const users = Communication.users;
@@ -117,9 +114,7 @@ const aspect = 16 / 10;
         <button />
         <button />
       </div>
-      <JitsiControls
-        @open="() => { mediaSettings = true; }"
-      />
+      <JitsiControls />
     </div>
     <div id="storytellers">
       <!-- <video class="container"></video> -->
@@ -138,11 +133,6 @@ const aspect = 16 / 10;
       <button>Order</button>
     </div>
   </div>
-
-  <Settings
-    v-if="mediaSettings"
-    @close="() => { mediaSettings = false; }"
-  />
 </template>
 
 <style lang="scss" scoped>

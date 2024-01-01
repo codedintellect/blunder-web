@@ -6,6 +6,7 @@ import JitsiLocalTrack from "./LocalTrack";
 declare const JitsiMeetJS: any;
 
 export default abstract class MediaControl {
+  public static mediaSettings: Ref<boolean> = ref(false);
   public static mediaDevices: Ref<MediaDeviceInfo[]> = ref([]);
 
   public static audio: JitsiLocalTrack = new JitsiLocalTrack("audio");

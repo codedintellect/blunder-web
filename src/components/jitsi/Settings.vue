@@ -10,8 +10,6 @@ import closeSvg from "/src/assets/icons/close.vue";
 import microphoneSvg from "/src/assets/icons/microphone.vue";
 import webcamSvg from "/src/assets/icons/webcam.vue";
 
-defineEmits(['close']);
-
 const selfMirror: Ref<boolean> = MediaControl.selfMirror;
 const noiseSuppression: Ref<boolean> = MediaControl.noiseSuppression;
 
@@ -77,7 +75,7 @@ function dropdown(event: MouseEvent) {
 
 <template>
   <div
-    @click="$emit('close')"
+    @click="() => { MediaControl.mediaSettings.value = false; }"
     class="blackout"
   ></div>
   <div id="communication-settings" class="container">
@@ -193,7 +191,7 @@ function dropdown(event: MouseEvent) {
     </div>
 
     <button
-      @click="$emit('close')"
+      @click="() => { MediaControl.mediaSettings.value = false; }"
       id="exit"
     >
       <close-svg />

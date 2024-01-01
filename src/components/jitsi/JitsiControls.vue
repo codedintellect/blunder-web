@@ -8,8 +8,6 @@ import cameraSvg from "/src/assets/icons/camera.vue";
 import microphoneSvg from "/src/assets/icons/microphone.vue";
 import settingsSvg from "/src/assets/icons/settings.vue";
 
-defineEmits(["open"]);
-
 if (!Communication.room)
   Communication.join("test");
 
@@ -20,7 +18,7 @@ const broadcastVideo: Ref<boolean> = MediaControl.video.broadcast;
 <template>
   <div id="communication-controls" class="panel-buttons">
     <button
-      @click="$emit('open')"
+      @click="() => { MediaControl.mediaSettings.value = true; }"
     >
       <settings-svg />
     </button>

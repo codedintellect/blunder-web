@@ -2,6 +2,8 @@
 import { ref, computed } from "vue";
 import type { DefineComponent, Ref } from "vue";
 import Communication from "./utils/jitsi"
+import MediaControl from "./utils/jitsi/classes/MediaControl";
+import Settings from "./components/jitsi/Settings.vue";
 // import Navbar from "./components/Navbar.vue";
 import NotFound from "./routes/_NotFound.vue";
 // MAIN PAGES
@@ -11,6 +13,7 @@ import About from "./routes/About.vue";
 import BloodOnTheClocktower from "./routes/BloodOnTheClocktower.vue";
 
 Communication.init();
+const mediaSettings = MediaControl.mediaSettings;
 
 type Page = {
   component: DefineComponent<{}, {}, any>;
@@ -57,5 +60,6 @@ const currentView = computed(() => {
   <!-- <Navbar :routes="routes" /> -->
   <div id="content-area">
     <component :is="currentView" />
+    <Settings v-if="mediaSettings" />
   </div>
 </template>
