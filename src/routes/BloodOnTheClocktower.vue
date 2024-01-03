@@ -23,61 +23,141 @@ const participants = computed(function() {
   );
 })
 
-// const total = 10;
-const scale = 10;
+const total = 10;
 const aspect = 16 / 10;
 
-// function circularPosition(id: number, total: number) {
-//   if (total % 2 == 1) {
-//     total++;
-//     if (id >= total / 2) {
-//       id++;
-//     }
-//   }
+const circularPosition = computed(function() {
+  const circleCoord = (axis: number, radius: number): number => {
+    return Math.sqrt(radius ** 2 - axis ** 2);
+  }
+  const angleDiff = (a: number, b: number) => {
+    if (isNaN(a) || isNaN(b)) return Infinity;
+    a = (a + Math.PI) % (2 * Math.PI);
+    b = (b + Math.PI) % (2 * Math.PI);
+    const results = a > b ? a - b : b - a;
+    return (results < 0 ? 2 * Math.PI - results : results) / Math.PI;
+  }
 
-//   let Y = scale;
-//   let X = Y * aspect;
-//   let radius = 50 - 2 * Y;
-//   let style: any = {
-//     'height': `${2*Y}%`,
-//     'padding-left': `${2*X}%`,
-//   };
-//   let side = id < total / 2 ? 'right' : 'left';
-//   let vert = Math.abs(id - total / 2) < total / 4 ? 'top' : 'bottom';
+  let debugCount = 0; // TODO: REMOVE
 
-//   if (id == 0 || id == total / 2) {
-//     style['left'] = '50%';
-//     style['transform'] = 'translateX(-50%)';
-//     style[vert] = '0';
-//     return style;
-//   }
-//   if (id % (total / 4) == 0) {
-//     style['bottom'] = `${radius}%`;
-//     style['transform'] = 'translateY(-50%)';
-//     style[side] = `${radius + 50}%`;
-//     return style;
-//   }
+  let height!: number, width: number, radius: number, dist: number;
+  let positions: number[][] = [];
+  const run = () => {
+    positions = [[0, radius + height / 2]];
 
-//   let k = total / 4 - 1;
-//   let b = k * (X - 2 * Y) + Y;
+    let finalAngle = Math.PI / 2;
+    for (let id = 1; id < total; id++) {
+      debugCount++; // TODO: REMOVE
+      let lastPos = positions[positions.length - 1];
+      let lastAngle = Math.atan2(lastPos[1], lastPos[0]);
 
-//   let qa = k**2 + 1;
-//   let qb = -1 * 2 * k * b;
-//   let qc = b**2 - radius**2;
-//   let qD = qb**2 - 4 * qa * qc;
+      // Determine in which direction we are wrapping around the circle
+      let dirX = -Math.sign(lastPos[1]);
+      let dirY =  Math.sign(lastPos[0]);
+      if (lastPos[0] === 0) dirY =  dirX;
+      if (lastPos[1] === 0) dirX = -dirY;
 
-//   let x = (-qb + Math.sqrt(qD)) / (2 * qa);
-//   let dist = x - X;
-//   let y = Math.sqrt(radius**2 - x**2);
-//   y -=
-//     (total / 4 - Math.abs(id % (total / 2) - total / 4) - 1)
-//     * (2 * Y + dist);
-//   x = Math.sqrt(radius**2 - y**2);
-//   style[vert] = `${radius - y}%`;
-//   style[side] = `calc(${x}% + 50%)`;
+      // h - Horizontal Displacement
+      let hX: number = lastPos[0] + (width + dist) * dirX;
+      let hY: number = circleCoord(hX + width / 2 * -Math.sign(hX), radius);
+      if (hY !== 0) hY = -dirX * (hY + height / 2);
+      if (Math.abs(hX) <=  width / 2) hY = (radius + height / 2) * dirY;
+      if (Math.abs(hY) <= height / 2) hX = (radius +  width / 2) * dirX;
+      let hAngle = Math.atan2(hY, hX);
 
-//   return style;
-// }
+      // v - Vertical Displacement
+      let vY: number = lastPos[1] + (height + dist) * dirY;
+      let vX: number = circleCoord(vY + height / 2 * -Math.sign(vY), radius);
+      if (vX !== 0) vX = dirY * (vX + width / 2);
+      if (Math.abs(vX) <=  width / 2) vY = (radius + height / 2) * dirY;
+      if (Math.abs(vY) <= height / 2) vX = (radius +  width / 2) * dirX;
+      let vAngle = Math.atan2(vY, vX);
+
+      const overflowCheck = (angle: number) => {
+        return lastAngle <= finalAngle && angle - finalAngle > 10e-16;
+      }
+
+      if (isNaN(hAngle) && isNaN(vAngle)) break; // No options -> dist too big;
+
+      if (angleDiff(lastAngle, hAngle) < angleDiff(lastAngle, vAngle)) {
+        if (id === 1) finalAngle = Math.PI * Math.sign(hAngle) - hAngle;
+        else if (overflowCheck(hAngle)) break;
+        positions.push([hX, hY]);
+      } else {
+        if (id === 1) finalAngle = Math.PI * Math.sign(vAngle) - vAngle;
+        else if (overflowCheck(vAngle)) break;
+        positions.push([vX, vY]);
+      }
+    }
+  }
+
+  const binSearch = (min: number, max: number, second?: boolean) => {
+    let minimum = min;
+    let maximum = max;
+    while (minimum != maximum) {
+      height = !second ? (minimum + maximum) / 2 : 25;
+      width = height * aspect;
+      radius = 50 - height;
+      dist = second ? (minimum + maximum) / 2 : 2;
+      if (debugCount > 10000) {
+        console.error("Iteration limit reached!");
+        break;
+      }
+      
+      run()
+
+      let lastPos = positions[positions.length - 1];
+      let goalPos = [-positions[1][0], positions[1][1]];
+      let diffPos = [goalPos[0] - lastPos[0], goalPos[1] - lastPos[1]];
+      if (positions.length < total) { // Overflow
+        maximum = second ? dist : height;
+      } else if (Math.sqrt(diffPos[0] ** 2 + diffPos[1] ** 2) > 10e-5) {
+        minimum = second ? dist : height;
+      } else {
+        break;
+      }
+    }
+  }
+
+  let start = window.performance.now();
+
+  height = 25;
+  width = height * aspect;
+  radius = 50 - height;
+  dist = 2;
+
+  run();
+
+  if (positions.length < total) {
+    binSearch(10, 25); // Largest size overflows -> find smaller size
+  } else {
+    binSearch(0, 50, true); // Largest size doesn't overflow -> enlarge dist
+  }
+
+  console.log(`Execution time: ${window.performance.now() - start} ms`);
+  console.log(`Iterations run: ${debugCount} times`); // TODO: REMOVE
+  if (total % 2 == 1) {
+    console.log(`Symmetry error margin: ${Math.abs(
+      positions[Math.floor(total / 2)][0] + positions[Math.ceil(total / 2)][0]
+    )} %`);
+  }
+
+  let styles = [];
+
+  for (let pos of positions) {
+    styles.push({
+      'height': `${height}%`,
+      'width': `${height * aspect}%`,
+
+      'left': `${pos[0] + 50}%`,
+      'top': `${pos[1] + 50}%`,
+
+      'transform': 'translate(-50%, -50%)',
+    });
+  }
+
+  return styles;
+});
 </script>
 
 <template>
@@ -88,23 +168,23 @@ const aspect = 16 / 10;
       :jitsi-id="key"
       :player-data="value"
       :style="{
-        height: `${scale}rem`,
-        width: `${scale * aspect}rem`
+        height: `10rem`,
+        width: `${10 * aspect}rem`
       }"
     />
   </div>
   <div id="play-circle"
     :style="{
-      '--radius': `${50 - scale}%`,
+      '--radius': `calc(50% - ${circularPosition[0]['height']})`,
     }"
   >
-    <!-- <video 
+    <div
       v-for="i in total"
       :key="'player-' + i"
-      class="container"
-      :style="circularPosition(i - 1, total)"
-    ></video> -->
-    <div id="safe-zone"></div>
+      class="container player-seat"
+      :style="circularPosition[i - 1]"
+    ></div>
+    <div id="safe-zone" v-if="true"></div>
   </div>
 
   <div id="bottom">
@@ -138,6 +218,12 @@ const aspect = 16 / 10;
 <style lang="scss" scoped>
 @import "node_modules/nord/src/sass/nord.scss";
 
+.player-seat {
+  position: absolute;
+
+  box-sizing: border-box;
+}
+
 #play-circle {
   position: absolute;
   height: 100%;
@@ -150,7 +236,7 @@ const aspect = 16 / 10;
 
   margin-right: var(--border-width);
 
-  background-color: rgba($nord10, 0.7);
+  // background-color: rgba($nord10, 0.7);
   border-radius: 50%;
 
   #safe-zone {
