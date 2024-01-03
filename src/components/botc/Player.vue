@@ -85,6 +85,12 @@ const vJitsiStream = {
 .player {
   position: relative;
 
+  transition: 
+    height 200ms ease-in-out,
+    width  200ms ease-in-out,
+    top    200ms ease-in-out,
+    left   200ms ease-in-out;
+
   &.request-help {
     .container {
       box-shadow:

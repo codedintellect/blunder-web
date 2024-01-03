@@ -23,7 +23,9 @@ const participants = computed(function() {
   );
 })
 
-const total = 10;
+const total = computed(function() {
+  return participants.value.size;
+});
 const aspect = 16 / 10;
 
 const circularPosition = computed(function() {
@@ -46,7 +48,7 @@ const circularPosition = computed(function() {
     positions = [[0, radius + height / 2]];
 
     let finalAngle = Math.PI / 2;
-    for (let id = 1; id < total; id++) {
+    for (let id = 1; id < total.value; id++) {
       debugCount++; // TODO: REMOVE
       let lastPos = positions[positions.length - 1];
       let lastAngle = Math.atan2(lastPos[1], lastPos[0]);
@@ -109,7 +111,7 @@ const circularPosition = computed(function() {
       let lastPos = positions[positions.length - 1];
       let goalPos = [-positions[1][0], positions[1][1]];
       let diffPos = [goalPos[0] - lastPos[0], goalPos[1] - lastPos[1]];
-      if (positions.length < total) { // Overflow
+      if (positions.length < total.value) { // Overflow
         maximum = second ? dist : height;
       } else if (Math.sqrt(diffPos[0] ** 2 + diffPos[1] ** 2) > 10e-5) {
         minimum = second ? dist : height;
@@ -128,17 +130,17 @@ const circularPosition = computed(function() {
 
   run();
 
-  if (positions.length < total) {
+  if (positions.length < total.value) {
     binSearch(10, 25); // Largest size overflows -> find smaller size
-  } else {
+  } else if (total.value > 1) {
     binSearch(0, 50, true); // Largest size doesn't overflow -> enlarge dist
   }
 
   console.log(`Execution time: ${window.performance.now() - start} ms`);
   console.log(`Iterations run: ${debugCount} times`); // TODO: REMOVE
-  if (total % 2 == 1) {
+  if (total.value % 2 == 1 && total.value > 1) {
     console.log(`Symmetry error margin: ${Math.abs(
-      positions[Math.floor(total / 2)][0] + positions[Math.ceil(total / 2)][0]
+      positions[Math.floor(total.value / 2)][0] + positions[Math.ceil(total.value / 2)][0]
     )} %`);
   }
 
@@ -146,6 +148,7 @@ const circularPosition = computed(function() {
 
   for (let pos of positions) {
     styles.push({
+      'position': 'absolute',
       'height': `${height}%`,
       'width': `${height * aspect}%`,
 
@@ -161,29 +164,18 @@ const circularPosition = computed(function() {
 </script>
 
 <template>
-  <div class="absolute pr-2 flex flex-col gap-4">
-    <Player
-      v-for="[key, value] of participants.entries()"
-      :key="key"
-      :jitsi-id="key"
-      :player-data="value"
-      :style="{
-        height: `10rem`,
-        width: `${10 * aspect}rem`
-      }"
-    />
-  </div>
   <div id="play-circle"
     :style="{
       '--radius': `calc(50% - ${circularPosition[0]['height']})`,
     }"
   >
-    <div
-      v-for="i in total"
-      :key="'player-' + i"
-      class="container player-seat"
-      :style="circularPosition[i - 1]"
-    ></div>
+    <Player
+      v-for="[key, value], index of participants.entries()"
+      :key="key"
+      :jitsi-id="key"
+      :player-data="value"
+      :style="circularPosition[index]"
+    />
     <div id="safe-zone" v-if="true"></div>
   </div>
 
@@ -217,12 +209,6 @@ const circularPosition = computed(function() {
 
 <style lang="scss" scoped>
 @import "node_modules/nord/src/sass/nord.scss";
-
-.player-seat {
-  position: absolute;
-
-  box-sizing: border-box;
-}
 
 #play-circle {
   position: absolute;
@@ -270,6 +256,12 @@ const circularPosition = computed(function() {
   display: flex;
   align-items: flex-end;
   gap: var(--border-width);
+
+  pointer-events: none;
+
+  & > * {
+    pointer-events: all;
+  }
 
   #bluffs {
     position: relative;
