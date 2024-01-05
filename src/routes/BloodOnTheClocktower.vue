@@ -1,10 +1,12 @@
 <!--  Blood on the Clocktower  -->
 
 <script lang="ts" setup>
-import { Ref, computed, watch } from 'vue';
+import { Ref, computed, ref, watch } from 'vue';
 import Communication from '../utils/jitsi';
 import JitsiControls from '../components/jitsi/JitsiControls.vue';
 import Player from '../components/botc/Player.vue';
+
+import Hand from '../assets/icons/hand.vue';
 
 import { Session } from "../utils/games/botc";
 
@@ -28,7 +30,12 @@ const total = computed(function() {
 });
 const aspect = 16 / 10;
 
-const circularPosition = computed(function() {
+const circularPosition: any = computed(function() {
+  // Skip update if amount of users unchanged
+  if (circularPosition.value?.length === total.value) {
+    return circularPosition.value;
+  }
+
   const circleCoord = (axis: number, radius: number): number => {
     return Math.sqrt(radius ** 2 - axis ** 2);
   }
@@ -159,21 +166,29 @@ const circularPosition = computed(function() {
     });
   }
 
+  console.log(styles.length);
+
   return styles;
 });
+
+const helpRequested = ref(false);
+watch(helpRequested, () => {
+  session.updatePresence("help", helpRequested.value);
+})
 </script>
 
 <template>
   <div id="play-circle"
     :style="{
-      '--radius': `calc(50% - ${circularPosition[0]['height']})`,
+      '--radius': `calc(48% - ${circularPosition[0]['height']})`,
     }"
   >
     <Player
       v-for="[key, value], index of participants.entries()"
       :key="key"
       :jitsi-id="key"
-      :player-data="value"
+      :jitsi-data="value"
+      :player-data="sessionState[key][0]"
       :style="circularPosition[index]"
     />
     <div id="safe-zone" v-if="true"></div>
@@ -188,7 +203,28 @@ const circularPosition = computed(function() {
       </div>
       <JitsiControls />
     </div>
+    <div style="flex: 1;"></div>
     <div id="storytellers">
+      <div id="main-storyteller" class="container">
+        <button
+          @click="(event) => {
+            let pos = (event.target as HTMLElement).getBoundingClientRect();
+            let X = (event.x - pos.left) / (pos.right - pos.left) * 100;
+            let Y = (event.y - pos.top) / (pos.bottom - pos.top) * 100;
+            (event.target as HTMLElement).style.setProperty(
+              '--click-position', `${100-X}% ${Y}%`
+            );
+            helpRequested = !helpRequested;
+          }"
+          :class="{
+            active: helpRequested,
+          }"
+        >
+          <Hand />
+          <Hand />
+          <Hand />
+        </button>
+      </div>
       <!-- <video class="container"></video> -->
     </div>
     <div id="stage-switcher" class="panel-buttons">
@@ -287,11 +323,94 @@ const circularPosition = computed(function() {
   }
 
   #storytellers {
-    flex: 1;
-
     display: flex;
     flex-direction: row-reverse;
     gap: inherit;
+
+    #main-storyteller {
+      position: relative;
+      height: 4rem;
+      width: 4rem;
+
+      border-radius: 1rem 1.4rem;
+
+      overflow: hidden;
+
+      & > button {
+        height: 100%;
+        width: 100%;
+
+        transform: scaleX(-1);
+
+        --click-position: 50% 50%;
+        @keyframes open {
+          from { 
+            clip-path: circle(0% at var(--click-position));
+          }
+          to { 
+            clip-path: circle(100% at var(--click-position));
+          }
+        }
+
+        &:hover:not(.active) {
+          svg:first-child {
+            filter: 
+              drop-shadow(-1px -1px 0.4px rgba($nord4, 0.7))
+              drop-shadow( 1px -1px 0.4px rgba($nord4, 0.7))
+              drop-shadow( 1px  1px 0.4px rgba($nord4, 0.7))
+              drop-shadow(-1px  1px 0.4px rgba($nord4, 0.7));
+          }
+        }
+
+        svg {
+          position: absolute;
+          inset: 0.2rem;
+
+          color: $nord3;
+
+          transform: translateX(2%);
+
+          // transform: translateX(-2%) scaleX(-1);
+          animation: none;
+
+          pointer-events: none;
+
+          &:first-child {
+            filter: 
+              drop-shadow(-1px -1px 0.4px rgba($nord0, 0.5))
+              drop-shadow( 1px -1px 0.4px rgba($nord0, 0.5))
+              drop-shadow( 1px  1px 0.4px rgba($nord0, 0.5))
+              drop-shadow(-1px  1px 0.4px rgba($nord0, 0.5));
+
+            transition: filter 100ms;
+          }
+
+          &:not(:first-child) {
+            color: $nord13;
+
+            clip-path: circle(0% at var(--click-position));
+            // animation: open 300ms ease-out reverse forwards;
+
+            &:last-child {
+              opacity: 0.5;
+            }
+          }
+        }
+
+        &.active {
+          svg:first-child {
+            transition: filter 500ms;
+          }
+
+          svg:not(:first-child) {
+            animation: open 300ms ease-in forwards;
+            &:last-child {
+              animation: open 120ms ease-in forwards;
+            }
+          }
+        }
+      }
+    }
   }
 
   #stage-switcher {

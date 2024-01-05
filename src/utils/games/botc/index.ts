@@ -3,7 +3,9 @@ import { supabase } from "../../supabase";
 import { Ref, ref } from "vue";
 
 export class Session {
-  private presence: any = {};
+  private presence: any = {
+    help: false,
+  };
   private room!: RealtimeChannel;
 
   public state: Ref<any> = ref<any>({});
@@ -39,5 +41,10 @@ export class Session {
       });
 
     return this;
+  }
+
+  updatePresence(key: string, value: any) {
+    this.presence[key] = value;
+    this.room?.track(this.presence);
   }
 }

@@ -6,9 +6,10 @@ import JitsiUser from '../../utils/jitsi/classes/User';
 import webcamSvg from '../../assets/icons/webcam.vue';
 import microphoneSvg from '../../assets/icons/microphone.vue';
 
-const props = defineProps(['jitsiId', 'playerData']);
+const props = defineProps(['jitsiId', 'jitsiData', 'playerData']);
+console.log(props.playerData);
 
-const user = props.playerData as JitsiUser;
+const user = props.jitsiData as JitsiUser;
 const mirror = MediaControl.selfMirror;
 
 const hasAudio: Ref<boolean> =
@@ -123,7 +124,7 @@ const vJitsiStream = {
     outline-width: 0;
 
     transition: box-shadow 200ms, outline-width 100ms;
-    transition-delay: 400ms;
+    transition-delay: outline-width 400ms;
 
     overflow: hidden;
 
@@ -141,7 +142,7 @@ const vJitsiStream = {
       outline-color: $nord2;
       outline-width: 0;
 
-      object-fit: fill;
+      object-fit: cover;
     }
 
     .info {
