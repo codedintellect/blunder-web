@@ -166,9 +166,17 @@ const circularPosition: any = computed(function() {
     });
   }
 
-  console.log(styles.length);
-
   return styles;
+});
+
+const circleScale = computed(function () {
+  let pos = circularPosition.value;
+  if (pos.length < 2) return 1;
+  let topElement = pos[Math.floor(pos.length / 2)];
+  let height = parseFloat(topElement["height"]);
+  let posY = parseFloat(topElement["top"]);
+  let top = posY - height / 2;
+  return 100 / (100 - top);
 });
 
 const helpRequested = ref(false);
@@ -180,6 +188,7 @@ watch(helpRequested, () => {
 <template>
   <div id="play-circle"
     :style="{
+      'height': `calc(100% * ${circleScale})`,
       '--radius': `calc(48% - ${circularPosition[0]['height']})`,
     }"
   >
@@ -248,11 +257,11 @@ watch(helpRequested, () => {
 
 #play-circle {
   position: absolute;
-  height: 100%;
   width: auto;
 
   left: 50%;
   transform: translateX(-50%);
+  bottom: 0;
 
   aspect-ratio: 1;
 
@@ -260,6 +269,8 @@ watch(helpRequested, () => {
 
   // background-color: rgba($nord10, 0.7);
   border-radius: 50%;
+
+  transition: height 200ms linear;
 
   #safe-zone {
     position: absolute;
