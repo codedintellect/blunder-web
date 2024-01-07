@@ -7,7 +7,6 @@ import webcamSvg from '../../assets/icons/webcam.vue';
 import microphoneSvg from '../../assets/icons/microphone.vue';
 
 const props = defineProps(['jitsiId', 'jitsiData', 'playerData']);
-console.log(props.playerData);
 
 const user = props.jitsiData as JitsiUser;
 const mirror = MediaControl.selfMirror;
