@@ -38,10 +38,10 @@ const vJitsiStream = {
   <div
     class="player"
     :class="{
-      'request-help': playerData['help'],
+      'raise-hand': playerData['hand'],
     }"
   >
-    <div class="help"></div>
+    <div class="hand"></div>
     <div
       class="container"
       :class="{
@@ -91,7 +91,7 @@ const vJitsiStream = {
     top    200ms ease-in-out,
     left   200ms ease-in-out;
 
-  &.request-help {
+  &.raise-hand {
     .container {
       box-shadow:
         calc(0.5 * var(--border-width))
@@ -99,7 +99,7 @@ const vJitsiStream = {
         $nord13;
     }
 
-    .help {
+    .hand {
       border-top-left-radius: 0.5rem;
     }
   }
@@ -225,7 +225,7 @@ const vJitsiStream = {
     }
   }
 
-  .help {
+  .hand {
     position: absolute;
     height: 2rem;
     width: 2rem;

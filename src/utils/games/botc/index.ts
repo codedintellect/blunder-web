@@ -4,7 +4,7 @@ import { Ref, ref } from "vue";
 
 export class Session {
   private presence: any = {
-    help: false,
+    hand: false,
   };
   private room!: RealtimeChannel;
 
@@ -46,5 +46,9 @@ export class Session {
   updatePresence(key: string, value: any) {
     this.presence[key] = value;
     this.room?.track(this.presence);
+  }
+
+  getValue(key: string): any {
+    return this.presence[key];
   }
 }
