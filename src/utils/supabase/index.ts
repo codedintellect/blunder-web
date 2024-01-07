@@ -1,6 +1,6 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 
 export const supabase: SupabaseClient = createClient(
-  'http://127.0.0.1:54321',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+  'https://fronddi.letz.dev:3443',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzA0NTIwODAwLAogICJleHAiOiAxODYyMzczNjAwCn0.SZMrq1DLE0AdXsmNu7hk7-B8j6STdoAz0FNEK1uYLo4'
 );

@@ -4,11 +4,9 @@ import JitsiUser from "./classes/User";
 import MediaControl from "./classes/MediaControl";
 
 declare const JitsiMeetJS: any;
+declare const config: any;
 
 export default abstract class Communication {
-  private static domain: string = "fronddi.letz.dev";
-  private static port: string = "4444";
-
   private static connection: any;
   public static room: any;
 
@@ -32,11 +30,8 @@ export default abstract class Communication {
       null,
       null,
       {
-        hosts: {
-          domain: this.domain,
-          muc: `conference.${this.domain}`,
-        },
-        serviceUrl: `https://${this.domain}:${this.port}/http-bind`,
+        hosts: config.hosts,
+        serviceUrl: config.websocket,
       },
     );
 
