@@ -9,9 +9,14 @@ const sessionState: Ref<any> = props.session.state;
 const users = Communication.users;
 
 const participants = computed(function() {
-  return new Map([...users.value].filter(
-    x => Object.keys(sessionState.value).indexOf(x[0]) >= 0)
+  const filteredUsers = [...users.value].filter(
+    x => Object.keys(sessionState.value).indexOf(x[0]) >= 0
   );
+  for (let i = 0; i < filteredUsers.length; i++) {
+    if (filteredUsers[0][1].isLocal()) break; // If first user is self -> break
+    filteredUsers.push(filteredUsers.shift()!); // Rotate users by 1
+  }
+  return new Map(filteredUsers);
 })
 
 const aspect = 16 / 10;
